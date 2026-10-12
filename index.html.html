@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#176b55">
+<title>GawaNear — Find local services</title>
+<style>
+:root{--green:#176b55;--mint:#e8f5ef;--ink:#17231f;--muted:#64716c;--line:#e2e9e5;--bg:#f7faf8}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}.nav{max-width:1100px;margin:auto;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:1.35rem;font-weight:850;color:var(--green);letter-spacing:-.04em}.brand span{color:var(--ink)}button,.btn{border:0;border-radius:12px;padding:11px 15px;background:var(--green);color:white;font-weight:700;cursor:pointer;font-size:.95rem;text-decoration:none;display:inline-block}button.secondary,.btn.secondary{background:white;color:var(--green);border:1px solid #b8d6ca}
+main{max-width:1100px;margin:auto;padding:26px 20px 60px}.hero{background:linear-gradient(135deg,#e5f5ec,#f7fbf8);border:1px solid #d9ece2;border-radius:24px;padding:30px;margin-bottom:24px}.eyebrow{color:var(--green);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em}.hero h1{font-size:clamp(2rem,5vw,3.3rem);letter-spacing:-.05em;line-height:1.05;margin:10px 0}.hero p{color:#52645c;max-width:580px;line-height:1.6}.searchrow{display:flex;gap:10px;max-width:680px;margin-top:20px}.searchrow input{flex:1;min-width:0}.field,input,select,textarea{font:inherit;border:1px solid #d7e1db;border-radius:11px;padding:12px;background:white;color:var(--ink);width:100%}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin:25px 0 14px}.sectionhead h2{margin:0;font-size:1.35rem;letter-spacing:-.03em}.muted{color:var(--muted);font-size:.92rem}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px}.filter{background:white;border:1px solid var(--line);color:#44544c;padding:9px 13px;border-radius:999px;font-size:.9rem}.filter.active{background:var(--green);color:white;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:white;border:1px solid var(--line);border-radius:17px;padding:18px;display:flex;flex-direction:column;min-height:230px}.emoji{font-size:1.6rem;background:var(--mint);border-radius:12px;width:48px;height:48px;display:grid;place-items:center}.card h3{margin:12px 0 4px}.tag{font-size:.77rem;color:var(--green);font-weight:800;background:var(--mint);padding:5px 8px;border-radius:7px;display:inline-block;margin-top:8px;align-self:flex-start}.card .bottom{margin-top:auto;padding-top:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}.price{font-weight:800}.location{color:var(--muted);font-size:.88rem;margin-top:4px}.empty{grid-column:1/-1;padding:28px;border:1px dashed #cbd8d0;border-radius:16px;text-align:center;color:var(--muted)}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:30px}.panel h2{margin-top:0}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.formgrid label{font-size:.88rem;font-weight:700;display:grid;gap:6px}.full{grid-column:1/-1}.note{font-size:.82rem;color:var(--muted);line-height:1.5}.notice{padding:12px;border-radius:11px;background:#fff8df;color:#69541c;font-size:.86rem;margin-top:12px}
+footer{border-top:1px solid var(--line);padding:22px 20px;text-align:center;color:var(--muted);font-size:.85rem}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.nav{padding:12px 15px}main{padding:18px 14px 42px}.searchrow{flex-direction:column}.hero h1{font-size:2.25rem}}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="brand">Gawa<span>Near</span></div><button onclick="document.getElementById('listForm').scrollIntoView({behavior:'smooth'})">+ List your service</button></div></header>
+<main>
+<section class="hero">
+<div class="eyebrow">Local services, made easier</div>
+<h1>Find help.<br>Support local workers.</h1>
+<p>Discover services in your community, from home repairs to tutoring. Or list your skills and help nearby customers find you.</p>
+<div class="searchrow"><input id="search" placeholder="Search services or location…" aria-label="Search services or location"><button onclick="render()">Search</button></div>
+</section>
+<div class="sectionhead"><div><h2>Explore local services</h2><div class="muted" id="count">Sample listings to help you get started</div></div></div>
+<div class="filters" id="filters"></div>
+<section class="grid" id="listings" aria-live="polite"></section>
+<section class="panel" id="listForm">
+<h2>List your service</h2><p class="muted">Share what you do. For this demo, listings are saved only in this browser on this device.</p>
+<form id="serviceForm"><div class="formgrid">
+<label>Provider or business name<input name="name" required maxlength="60" placeholder="e.g. Ana's Home Cleaning"></label>
+<label>Service category<select name="category" required><option value="">Choose one</option><option>Cleaning</option><option>Repairs</option><option>Tutoring</option><option>Gardening</option><option>Food</option><option>Beauty</option><option>Other</option></select></label>
+<label>Town or area<input name="location" required maxlength="80" placeholder="e.g. Majayjay, Laguna"></label>
+<label>Starting price (PHP)<input name="price" required type="number" min="0" step="1" placeholder="e.g. 300"></label>
+<label>Contact number<input name="phone" required type="tel" maxlength="30" placeholder="e.g. 09XX XXX XXXX"></label>
+<label>Short description<input name="description" required maxlength="140" placeholder="What service do you offer?"></label>
+</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px"><button type="submit">Add listing</button><span class="note">Demo only — listings are not publicly published.</span></div><div id="formMessage" role="status"></div></form>
+<div class="notice"><strong>Before launching publicly:</strong> review listings, get consent before displaying contact details, protect personal information, and verify providers where possible.</div>
+</section>
+<section class="panel"><h2>How GawaNear could earn</h2><p><strong>Start free:</strong> build trust and attract real customers first.</p><p><strong>Later:</strong> offer optional featured listings (for example, ₱49–₱99 per week), or a modest monthly provider plan. These are test prices, not guaranteed income.</p><p class="note">Don't charge providers until you can show that the app brings them real inquiries. Never promise guaranteed customers.</p></section>
+</main>
+<footer>GawaNear prototype · Built to support local communities · Sample data is for demonstration only</footer>
+<script>
+const samples=[
+{id:1,name:"Mika Home Cleaning",category:"Cleaning",location:"Majayjay",price:350,phone:"09170000001",description:"Basic home cleaning and tidying.",emoji:"🧹",sample:true},
+{id:2,name:"Jun's Home Repairs",category:"Repairs",location:"Lucban",price:500,phone:"09170000002",description:"Minor repairs and furniture assembly.",emoji:"🛠️",sample:true},
+{id:3,name:"Tina Math Tutor",category:"Tutoring",location:"Majayjay",price:200,phone:"09170000003",description:"Friendly math help for elementary students.",emoji:"📚",sample:true},
+{id:4,name:"Green Thumb Gardening",category:"Gardening",location:"Luisiana",price:300,phone:"09170000004",description:"Garden cleanup and plant care.",emoji:"🌱",sample:true},
+{id:5,name:"Lina's Merienda",category:"Food",location:"Majayjay",price:80,phone:"09170000005",description:"Homemade snacks by pre-order.",emoji:"🍲",sample:true},
+{id:6,name:"Community Beauty Services",category:"Beauty",location:"Pagsanjan",price:250,phone:"09170000006",description:"Basic styling by appointment.",emoji:"✂️",sample:true}
+];
+let active="All";
+const emojis={Cleaning:"🧹",Repairs:"🛠️",Tutoring:"📚",Gardening:"🌱",Food:"🍲",Beauty:"✂️",Other:"🧰"};
+function getUser(){try{return JSON.parse(localStorage.getItem("gawanear-listings")||"[]")}catch(e){return []}}
+function allItems(){return [...getUser().map(x=>({...x,user:true})),...samples]}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderFilters(items){let cats=["All",...new Set(items.map(x=>x.category))];if(!cats.includes(active))active="All";document.getElementById("filters").innerHTML=cats.map(c=>`<button class="filter ${c===active?"active":""}" onclick="active=${JSON.stringify(c)};render()">${esc(c)}</button>`).join("")}
+function render(){let items=allItems(),q=document.getElementById("search").value.trim().toLowerCase();renderFilters(items);let shown=items.filter(x=>(active==="All"||x.category===active)&&[x.name,x.category,x.location,x.description].join(" ").toLowerCase().includes(q));document.getElementById("count").textContent=`${shown.length} service${shown.length===1?"":"s"} found · Sample listings are fictional`;document.getElementById("listings").innerHTML=shown.length?shown.map(x=>`<article class="card"><div class="emoji">${x.user?"✨":(x.emoji||emojis[x.category]||"🧰")}</div><h3>${esc(x.name)}</h3><div class="location">📍 ${esc(x.location)}</div><p class="muted">${esc(x.description)}</p><span class="tag">${esc(x.category)}${x.user?" · Your demo listing":""}</span><div class="bottom"><span class="price">From ₱${Number(x.price).toLocaleString("en-PH")}</span>${x.user?'<span class="note">Local demo</span>':'<span class="note">Example only</span>'}</div>${x.user?`<button class="secondary" style="margin-top:12px" onclick="deleteListing(${x.id})">Remove listing</button>`:""}</article>`).join(""):'<div class="empty">No services match that search. Try another keyword or category.</div>'}
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("serviceForm").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.target);const phone=String(f.get("phone")).trim();const item={id:Date.now(),name:String(f.get("name")).trim(),category:String(f.get("category")),location:String(f.get("location")).trim(),price:Number(f.get("price")),phone,description:String(f.get("description")).trim()};try{const old=getUser();old.unshift(item);localStorage.setItem("gawanear-listings",JSON.stringify(old));document.getElementById("formMessage").innerHTML='<p style="color:#176b55;font-weight:700">Listing added to this browser demo!</p><p class="note">Other people cannot see it yet. A shared database is needed for a public launch.</p>';e.target.reset();active="All";render()}catch(err){document.getElementById("formMessage").textContent="Could not save this listing in your browser. Try another browser or device."}});
+function deleteListing(id){if(!confirm("Remove this demo listing?"))return;localStorage.setItem("gawanear-listings",JSON.stringify(getUser().filter(x=>x.id!==id)));render()}
+render();
+</script>
+</body>
+</html>
